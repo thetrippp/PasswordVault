@@ -408,13 +408,14 @@
             }
 
             bindEvents() {
-    // FIX: Use .bind(this) for methods attached to form events 
-    // to ensure 'this' refers to the PasswordManager instance.
+    // These methods MUST use .bind(this) to ensure 'this' refers to the 
+    // PasswordManager instance when the form is submitted.
     document.getElementById('setup-form').addEventListener('submit', this.handleSetup.bind(this));
     document.getElementById('login-form').addEventListener('submit', this.handleLogin.bind(this)); 
     document.getElementById('reset-setup').addEventListener('click', this.resetSetup.bind(this));
     
-    // Existing handlers that use arrow functions (which maintain 'this' scope) are fine:
+    // The rest of your existing handlers that use arrow functions are fine
+    // because arrow functions correctly maintain the 'this' context.
     document.getElementById('password-form').addEventListener('submit', (e) => this.handleAddPassword(e));
     document.getElementById('add-password-btn').addEventListener('click', () => this.showAddForm());
     document.getElementById('cancel-add').addEventListener('click', () => this.hideAddForm());
