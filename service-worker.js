@@ -1,11 +1,10 @@
 const CACHE_NAME = 'password-manager-v1';
 const urlsToCache = [
-  // IMPORTANT: If you rename the main file to index.html, change this line!
-  '/index.html',
-  '/manifest.json',
-  '/service-worker.js',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  './index.html',              // <-- CHANGED from testPasswordmanager.html
+  './manifest.json',
+  './service-worker.js',
+  './icons/icon-192x192.png',
+  './icons/icon-512x512.png'
 ];
 
 // Install event: caches the necessary assets
