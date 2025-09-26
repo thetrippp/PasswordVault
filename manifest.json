@@ -1,0 +1,16 @@
+{
+  "name": "PasswordVault",
+  "short_name": "PassVault",
+  "description": "Encrypted password storage with GitHub sync.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#667eea",
+  "icons": [
+    {
+      "src": "/icons/icon.png",
+      "sizes": "24x124",
+      "type": "image/png"
+    }
+  ]
+}
