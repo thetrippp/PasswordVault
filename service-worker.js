@@ -1,4 +1,4 @@
-const CACHE_NAME = 'password-manager-v1';
+const CACHE_NAME = 'password-manager-v2';
 const urlsToCache = [
   './index.html',              // <-- CHANGED from testPasswordmanager.html
   './manifest.json',
