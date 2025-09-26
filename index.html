@@ -408,16 +408,20 @@
             }
 
             bindEvents() {
-                document.getElementById('setup-form').addEventListener('submit', (e) => this.handleSetup(e));
-                document.getElementById('login-form').addEventListener('submit', (e) => this.handleLogin(e)); // NEW
-                document.getElementById('reset-setup').addEventListener('click', () => this.resetSetup());    // NEW
-                document.getElementById('password-form').addEventListener('submit', (e) => this.handleAddPassword(e));
-                document.getElementById('add-password-btn').addEventListener('click', () => this.showAddForm());
-                document.getElementById('cancel-add').addEventListener('click', () => this.hideAddForm());
-                document.getElementById('sync-btn').addEventListener('click', () => this.syncWithGitHub());
-                document.getElementById('logout-btn').addEventListener('click', () => this.logout());
-                document.getElementById('export-btn').addEventListener('click', () => this.exportBackup());
-            }
+    // FIX: Use .bind(this) for methods attached to form events 
+    // to ensure 'this' refers to the PasswordManager instance.
+    document.getElementById('setup-form').addEventListener('submit', this.handleSetup.bind(this));
+    document.getElementById('login-form').addEventListener('submit', this.handleLogin.bind(this)); 
+    document.getElementById('reset-setup').addEventListener('click', this.resetSetup.bind(this));
+    
+    // Existing handlers that use arrow functions (which maintain 'this' scope) are fine:
+    document.getElementById('password-form').addEventListener('submit', (e) => this.handleAddPassword(e));
+    document.getElementById('add-password-btn').addEventListener('click', () => this.showAddForm());
+    document.getElementById('cancel-add').addEventListener('click', () => this.hideAddForm());
+    document.getElementById('sync-btn').addEventListener('click', () => this.syncWithGitHub());
+    document.getElementById('logout-btn').addEventListener('click', () => this.logout());
+    document.getElementById('export-btn').addEventListener('click', () => this.exportBackup());
+}
 
             // --- PERSISTENCE AND STATE MANAGEMENT ---
 
