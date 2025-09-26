@@ -461,32 +461,31 @@
                 this.masterPassword = document.getElementById('master-password').value; 
 
                 if (!this.masterPassword || !this.githubToken) {
-                     this.showStatus('All fields must be filled.', 'error');
-                     return;
-                }
+         this.showStatus('All fields must be filled.', 'error');
+         return;
+    }
 
-                try {
-                    this.showStatus('Testing GitHub connection and loading vault...', 'info');
+    try {
+        console.log("LOG 1: Starting setup attempt."); // <--- ADD THIS
+        this.showStatus('Testing GitHub connection and loading vault...', 'info');
 
-                    // 1. Test GitHub connection
-                    await this.testGitHubConnection();
-                    
-                    // 2. Load existing data (decrypt will use the entered masterPassword)
-                    await this.loadFromGitHub(false); 
-                    
-                    // 3. Save setup and switch to main view
-                    this.isInitialized = true;
-                    this.saveState();
-                    this.showMainSection();
-                    this.showStatus('Setup complete! Vault unlocked.', 'success');
-                    
-                    // Clear the setup form fields
-                    document.getElementById('setup-form').reset();
-                    document.getElementById('master-password').value = ''; 
-                } catch (error) {
-                    this.isInitialized = false;
-                    this.showStatus('Setup failed: ' + error.message, 'error');
-                }
+        // 1. Test GitHub connection
+        console.log("LOG 2: Attempting GitHub connection test..."); // <--- ADD THIS
+        await this.testGitHubConnection();
+        console.log("LOG 3: GitHub connection successful."); // <--- ADD THIS
+        
+        // 2. Load existing data
+        await this.loadFromGitHub(false); 
+        
+        // 3. If successful, transition to main view
+        // ... (rest of the successful setup code) ...
+        
+    } catch (error) {
+        // ... (rest of the error handling code) ...
+        console.error("LOG 4: Setup failed inside try/catch:", error); // <--- MODIFY CATCH BLOCK
+        this.isInitialized = false;
+        this.showStatus('Setup failed: ' + error.message, 'error');
+    }
             }
 
             // --- NEW LOGIN HANDLER ---
@@ -564,7 +563,7 @@
                 }
             }
 
-            async loadFromGitHub(isUnlock = false) {
+               async loadFromGitHub(isUnlock = false) {
                 try {
                     const response = await fetch(`https://api.github.com/repos/${this.repoOwner}/${this.repoName}/contents/passwords.json`, {
                         headers: {
@@ -576,20 +575,28 @@
                     if (response.ok) {
                         const data = await response.json();
                         const encryptedData = atob(data.content);
+                        
+                        // Decryption attempts to use the masterPassword set in handleSetup/handleLogin
                         const decryptedData = await this.decrypt(encryptedData); 
+                        
                         this.passwords = JSON.parse(decryptedData);
                         this.updateSyncStatus(true);
                         return true;
                     } else if (response.status === 404 && !isUnlock) {
+                        // File doesn't exist yet, okay for initial setup.
                         this.passwords = [];
                         console.log('No existing password file found, starting fresh');
                         return false;
                     } else {
-                        throw new Error(`Failed to load vault (Status: ${response.status})`);
+                        // If the response is not OK (e.g., 403 Forbidden), throw an error with status.
+                        throw new Error(`GitHub Load Failed (Status: ${response.status})`);
                     }
                 } catch (error) {
+                    // This catch block executes on network failure, API status error, OR decryption failure.
                     this.updateSyncStatus(false);
-                    throw new Error('Vault access failed: ' + error.message);
+                    
+                    // CRITICAL FIX: Re-throw the original error to be caught by handleSetup/handleLogin
+                    throw error; // <--- This line is the solution
                 }
             }
 
@@ -601,7 +608,7 @@
                     // Check if file exists to get SHA
                     let sha = null;
                     try {
-                        const existingFile = await fetch(`https://api.github.com/repos/${this.repoOwner}/${this.repoName}/contents/passwords.json`, {
+                        const existingFile = await fetch(`https://api.github.com/repos/${this.repoOwner}/${this.repoName}/passwords.json`, {
                             headers: {
                                 'Authorization': `Bearer ${this.githubToken}`,
                                 'Accept': 'application/vnd.github.v3+json'
@@ -622,7 +629,7 @@
                         ...(sha && { sha })
                     };
 
-                    const response = await fetch(`https://api.github.com/repos/${this.repoOwner}/${this.repoName}/contents/passwords.json`, {
+                    const response = await fetch(`https://api.github.com/repos/${this.repoOwner}/${this.repoName}/passwords.json`, {
                         method: 'PUT',
                         headers: {
                             'Authorization': `Bearer ${this.githubToken}`,
