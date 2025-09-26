@@ -3,8 +3,8 @@ const urlsToCache = [
   './index.html',              // <-- CHANGED from testPasswordmanager.html
   './manifest.json',
   './service-worker.js',
-  './icons/icon-192x192.png',
-  './icons/icon-512x512.png'
+  './icons/icon192x192.png',
+  './icons/icon512x512.png'
 ];
 
 // Install event: caches the necessary assets
